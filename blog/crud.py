@@ -2,8 +2,9 @@ from . import schemas, models
 from fastapi import HTTPException, status
 from .util import hash_password
 
-def create_blog(request, db):
-    new_blog = models.Blog(title=request.title, body=request.body)
+def create_blog(request, db, user_id):
+    check_resource_exists(user_id, db, models.User)
+    new_blog = models.Blog(title=request.title, body=request.body, creator_id=user_id)
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)

@@ -16,8 +16,8 @@ def get_db():
 
 @app.post("/blog", status_code=status.HTTP_201_CREATED, response_model=schemas.Blog, 
           tags=["blog"])
-def create_blog(request: schemas.BlogCreate, db: Session = Depends(get_db)):
-    new_blog = crud.create_blog(request=request, db=db)
+def create_blog(user_id, request: schemas.BlogCreate, db: Session = Depends(get_db)):
+    new_blog = crud.create_blog(request=request, db=db, user_id=user_id)
 
     return new_blog
 
