@@ -1,0 +1,37 @@
+from datetime import datetime, timedelta, timezone
+import jwt
+from typing import Union
+from blog.schemas import Token, TokenData
+
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jwt.exceptions import InvalidTokenError
+
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+def validate_access_token(token:str, credentials_exception):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if not username:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except InvalidTokenError:
+        raise credentials_exception
+    else:
+        return token_data

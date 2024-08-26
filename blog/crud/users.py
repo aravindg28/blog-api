@@ -1,5 +1,6 @@
 from blog import models
-from blog.util import hash_password, check_resource_exists
+from blog.auth.hash import hash_password
+from blog.crud.util import check_resource_exists
 
 def create_user(request, db):
     new_user = models.User(email=request.email, password=hash_password(request.password))

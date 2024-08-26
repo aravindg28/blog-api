@@ -1,5 +1,5 @@
 from blog import models
-from blog.util import check_resource_exists
+from blog.crud.util import check_resource_exists
 
 def create_blog(request, db, user_id):
     check_resource_exists(user_id, db, models.User)
